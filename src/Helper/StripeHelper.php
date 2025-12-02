@@ -2,10 +2,9 @@
 
 namespace Wexample\SymfonyStripe\Helper;
 
-
-use Stripe\Event;
-use Wexample\SymfonyHelpers\Helper\EnvironmentHelper;
 use function hash_hmac;
+
+use Wexample\SymfonyHelpers\Helper\EnvironmentHelper;
 
 class StripeHelper
 {
