@@ -16,6 +16,6 @@
     }
   ],
   "require": {
-    "wexample/symfony-helpers": "1.0.66"
+    "wexample/symfony-helpers": "1.0.68"
   }
 }
