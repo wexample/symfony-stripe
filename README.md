@@ -1,6 +1,6 @@
 # symfony_stripe
 
-Version: 1.0.84
+Version: 1.0.85
 
 Stripe helpers for Symfony
 
