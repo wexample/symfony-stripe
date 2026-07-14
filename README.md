@@ -1,6 +1,6 @@
 # symfony_stripe
 
-Version: 1.0.85
+Version: 1.0.86
 
 Stripe helpers for Symfony
 
@@ -27,7 +27,7 @@ Visit the [Wexample Suite documentation](https://docs.wexample.com) for the comp
 
 ## Dependencies
 
-- wexample/symfony-helpers: *
+- wexample/symfony-helpers: >=3.0.0
 
 ## Versioning & Compatibility Policy
 
