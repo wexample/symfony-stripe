@@ -1,0 +1,55 @@
+## Architecture
+
+### One file, no bundle
+
+The package is a Composer library, not a Symfony bundle. composer.json declares `"type": "library"` and a single autoload rule:
+
+```json
+"psr-4": {
+  "Wexample\\SymfonyStripe\\": "src/"
+}
+```
+
+There is no bundle class, no `DependencyInjection/`, no `config/services.yaml`, no `Resources/`. Nothing is registered in the host application's `bundles.php` and nothing is wired into the container — installing the package only adds a namespace to the autoloader. The entire shipped surface is src/Helper/StripeHelper.php.
+
+### `StripeHelper`
+
+`Wexample\SymfonyStripe\Helper\StripeHelper` is a plain class with two public static methods, no constructor, no properties and no state. Callers reach it statically, which is why the absence of a container registration costs nothing.
+
+Both methods take everything they need as arguments. Neither reads an environment variable, a parameter bag or a configuration file: the environment name and the webhook secret arrive as `string` parameters. The package therefore makes no decision about where the Stripe keys live — the host application does.
+
+### The two call paths
+
+`isStripeTestEnvironment()` is a lookup and nothing else:
+
+```php
+return in_array(
+    $environment,
+    EnvironmentHelper::LIST_LOW_SECURITY
+);
+```
+
+`EnvironmentHelper::LIST_LOW_SECURITY` comes from `wexample/symfony-helpers` and holds `dev`, `local`, `test`. That `use Wexample\SymfonyHelpers\Helper\EnvironmentHelper;` is the only edge leaving the package, matching the sole `require` entry, `"wexample/symfony-helpers": ">=5.0.0"`.
+
+`buildFakeSignature()` reproduces Stripe's `Stripe-Signature` header locally:
+
+```php
+$timestamp = time();
+$signedPayload = "{$timestamp}.{$payload}";
+
+return implode(',', [
+    't='.$timestamp,
+    'v1='.hash_hmac(
+        'sha256',
+        $signedPayload,
+        $secret
+    ), ]);
+```
+
+It calls `time()` and `hash_hmac()` — the file imports the latter explicitly with `use function hash_hmac;` — and returns a string. No HTTP client, no Stripe SDK, no dependency on the Stripe PHP library at all. A webhook controller can be posted to from a test case, and its signature verifier will accept the payload without any call reaching Stripe.
+
+### What this shape implies when editing
+
+Because Stripe's SDK is not a dependency, the signature scheme in `buildFakeSignature()` is knowledge duplicated from Stripe's specification. If Stripe moves past scheme `v1`, this file is what changes; nothing else in the package knows the format.
+
+New code goes under `src/<Domain>/`, following PSR-4 — `Helper/` is a directory, not a special case. Introducing a non-static, injectable service would be a structural change, not an addition: it would require a bundle class and a DI extension that the package does not currently have. The current staticness and the single dependency are what let the helpers run in a unit test with no kernel booted.
