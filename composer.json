@@ -3,7 +3,7 @@
   "description": "Stripe helpers for Symfony",
   "type": "library",
   "license": "MIT",
-  "version": "1.0.91",
+  "version": "1.0.92",
   "autoload": {
     "psr-4": {
       "Wexample\\SymfonyStripe\\": "src/"
@@ -17,6 +17,6 @@
   ],
   "require": {
     "php": ">=8.5",
-    "wexample/symfony-helpers": ">=8.0.0"
+    "wexample/symfony-helpers": ">=9.0.0"
   }
 }
