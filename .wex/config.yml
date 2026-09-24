@@ -6,7 +6,7 @@ git:
 global:
   name: symfony_stripe
   type: app
-  version: 1.0.92
+  version: 1.0.93
 wex:
   migration: 7
   version: 6.0.136
